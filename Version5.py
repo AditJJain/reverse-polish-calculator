@@ -1,10 +1,24 @@
-# Better type conversion than V3.
+# Adds support for floating point numbers.
 
 import sys
 
+def isfloat(value):
+    try:
+        float(value)
+        return True
+    except ValueError:
+        return False
+
+def isint(value):
+    try:
+        int(value)
+        return True
+    except ValueError:
+        return False
+    
 def main(expression):
     stack = expression.split(" ")
-    stack = [int(element) if element.isnumeric() else element for element in stack]
+    stack = [int(element) if isint(element) else float(element) if isfloat(element) else element for element in stack]
     numbers = []
     operator = ["+", "-", "*", "/"]
     operator_lst = []
@@ -13,6 +27,8 @@ def main(expression):
 
     for element in stack:
         if isinstance(element, int):
+            numbers.append(element)
+        elif isinstance(element, float):
             numbers.append(element)
         elif element in operator:
             operator_lst.append(element)
@@ -29,15 +45,19 @@ def main(expression):
             first = numbers[0]
             second = numbers[1]
             current_operator = operator_lst[j]
-            if current_operator == "+":
-                result = first + second
-            elif current_operator == "-":
-                result = second - first
-            elif current_operator == "*":
-                result = first * second
-            elif current_operator == "/":
-                result = second / first
-        
+            try:
+                if current_operator == "+":
+                    result = first + second
+                elif current_operator == "-":
+                    result = second - first
+                elif current_operator == "*":
+                    result = first * second
+                elif current_operator == "/":
+                    result = second / first
+            except ZeroDivisionError:
+                print("Cannot divide by zero.")
+                break
+
             numbers = [result] + numbers[2:]
             position = stack.index(first)
             stack[position] = result
